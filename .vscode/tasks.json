@@ -1,0 +1,116 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"label": "Build and crank",
+			"problemMatcher": [],
+			"dependsOn": [
+				"amigaassembly: build",
+				"Run Cranker"
+			]
+			},	
+			{
+			"type": "shell",
+			"label": "Run Cranker",
+			"command": "cranker.exe -d progress -f uae/dh0/InAWhat -o uae/dh0/InAWhat.exe ",
+			"problemMatcher": []
+		},
+		{
+			"type": "amigaassembly",
+			"vasm": {
+				"enabled": true,
+				"command": "${config:amiga-assembly.binDir}/vasmm68k_mot",
+				"args": [
+					"-m68000",
+					"-Fhunk",
+					"-linedebug",
+					"-DMakeExe=1"
+				]
+			},
+			"vlink": {
+				"enabled": true,
+				"command": "${config:amiga-assembly.binDir}/vlink",
+				"includes": "*.{s,S,asm,ASM}",
+				"excludes": "",
+				"exefilename": "../uae/dh0/InAWhat",
+				"entrypoint": "src/InAWhat.s",
+				"args": [
+					"-bamigahunk",
+					"-Bstatic"
+				]
+			},
+			"problemMatcher": [],
+			"label": "amigaassembly: build",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		},
+		{
+			"type": "amigaassembly",
+			"adfgenerator": {
+				"ADFToolsParentDir": "${config:amiga-assembly.binDir}",
+				"sourceRootDir": "uae/dh0",
+				"outputADFFile": "./build/InAWhat.adf",
+				"includes": "**/*",
+				"excludes": "**/InAWhat",
+				"adfCreateOptions": [
+					"--label=InAWhat"
+				],
+				"bootBlockSourceFile": "InAWhat.s"
+			},
+			"problemMatcher": [],
+			"label": "amigaassembly: create ADF",
+			"dependsOn": [
+				"Build and crank"
+			]
+		},
+		{
+			"type": "amigaassembly",
+			"adfgenerator": {
+				"ADFToolsParentDir": "${config:amiga-assembly.binDir}",
+				"sourceRootDir": "uae/dh0",
+				"outputADFFile": "./build/InAWhat.adf",
+				"includes": "**/*",
+				"excludes": "**/*",
+				"adfCreateOptions": [
+					"--label=InAWhat"
+				],
+				"bootBlockSourceFile": "InAWhat.s"
+			},
+			"problemMatcher": [],
+			"label": "amigaassembly: create bootblock only ADF",
+		},
+		{
+			"type": "amigaassembly",
+			"vasm": {
+				"enabled": true,
+				"command": "${config:amiga-assembly.binDir}/vasmm68k_mot",
+				"args": [
+					"-m68000",
+					"-Fbin",
+					"-DMakeExe=0"
+				]
+			},
+			"vlink": {
+				"enabled": true,
+				"command": "${config:amiga-assembly.binDir}/vlink",
+				"includes": "InAWhat*.{s,S,asm,ASM}",
+				"excludes": "",
+				"exefilename": "../uae/dh0/InAWhat",
+				"entrypoint": "src/InAWhat.s",
+				"args": [
+					"-bamigahunk",
+					"-Bstatic"
+				]
+			},
+			"problemMatcher": [],
+			"label": "amigaassembly: build binary",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		},
+	]
+}
