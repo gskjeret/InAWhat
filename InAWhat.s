@@ -1,5 +1,7 @@
+BB_TARGET = 32
+
 ; Set to 0 for running on real hardware
-DEBUG_DETAIL set 1
+; DEBUG_DETAIL set 1
 
 	ifnd MakeExe
 MakeExe set 0
@@ -53,7 +55,9 @@ cop:
 	dc.l	$01460000
 	endif
 
-	; dc.w	BPLCON0,$0200 ; Can be skipped when bootblock
+	; BPLCON0 can be skipped when bootblock
+	; Can also be skipped for exe, because BPL DMA is turned off
+	; dc.w	BPLCON0,$0200 
 
 	dc.w	$0180,$006c
 	dc.W	$a801,$fffe
@@ -61,19 +65,17 @@ cop:
 
 	; dc.w	$ffff,$fffe ; Lulz
 
-
-;Shallow Hash=239134246581409715146421741071466578145
 BB_END:
 	ifeq MakeExe
 BB_SIZE=	BB_END-BB_START
-	if	BB_SIZE<=1024
+	if	BB_SIZE<=BB_TARGET
 		printt ""
 		printt "IT FITS! bytes used:"
 		printv BB_SIZE
-		; dcb.b	1024-BB_SIZE,"x"
+		; dcb.b	BB_TARGET-BB_SIZE,"x"
 	else
 		printt ""
 		printt "IT IS TOO BIG! bytes to remove:"
-		printv 1024-BB_SIZE
+		printv BB_TARGET-BB_SIZE
 	endc
 	endc
