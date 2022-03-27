@@ -17,6 +17,7 @@ MakeExe set 0
 
 BB_START
 
+; These are magic bytes and can't be changed
 	ifeq MakeExe
 		printt "Building bootblock"
 		dc.b	"DOS",0
@@ -26,25 +27,14 @@ BB_START
 Startup:
 ; If we boot from bootblock clearing DMA channels is not required
 	ifne MakeExe
-	move.w	#$7fff,DMACON-6(a6)
+		lea	CustomBase+6,a6
+		move.w	#$7fff,DMACON-6(a6)
 	endc
-
-	; lea	CustomBase+6,a6
-	; lea	COLOR00-VHPOSR(a6),a5
-	lea		cop(pc),a0
-	move.l	a0,CustomBase+COP1LCH
 	
-	; moveq	#$6c,d0
-	; moveq	#-64,d1 ; $ffc0
+	add.w	#cop-BB_START,a4
+	move.l	a4,$dff080
 .Wait:	
-; 	move.w	d0,(a5)
-; .vbl1:	
-; 	cmp.b	(a6),d0
-; 	bne.s	.vbl1
-; 	move.w	d1,(a5)
-; .vbl2:	cmp.b	#45,(a6)
-; 	bne.s	.vbl2
-	bra	.Wait
+; Wait? nah, let's just execute the copperlist and see what happens
 
 cop:
 	ifne MakeExe
@@ -61,7 +51,8 @@ cop:
 
 	dc.w	$0180,$006c
 	dc.W	$a801,$fffe
-	dc.w	$0180,$0fc0
+; Almost the right color
+	dc.w	$0180,$6Ff4;$0fc0
 
 	; dc.w	$ffff,$fffe ; Lulz
 
