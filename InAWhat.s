@@ -20,7 +20,7 @@ Startup:
 ; This should be quite doable as a 64B executable though, if anyone's interested.
 
 MAGIC_COPADDR = $156c ; Kick 1.2/1.3, fastmem exists
-; MAGIC_COPADDR = $5c54 ; Kick 1.2/1.3, no fastmem
+; MAGIC_COPADDR = $5c54 ; Kick 1.3, no fastmem
 ; MAGIC_COPADDR = $5b9c ; Kick 1.2, no fastmem
 ; MAGIC_COPADDR = $3a74 ; AROS Kick, fastmem exists (AROS version from WinUAE 4.9.0)
 ; MAGIC_COPADDR = $4bf4 ; AROS Kick, no fastmem (AROS version from WinUAE 4.9.0)
