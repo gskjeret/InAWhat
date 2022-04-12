@@ -1,0 +1,24 @@
+Ukramiga 32B by Nosferatu/Offence
+-------------------------------
+
+A 32 byte Amiga bootblock intro for 
+Revision 2022, submitted to wild compo
+
+Requirements
+~~~~~~~~~~~~
+Kick 1.2 or 1.3, and any fastmem.
+The compomachine with 1.3 and 512K+512K
+should work fine.
+
+No exit, sorry.
+
+Enclosing the bootblock (the full 
+1024 bytes because that's what I got),
+an ADF with the bootblock, and also
+here's the sourcecode:
+https://github.com/gskjeret/InAWhat
+
+Credits
+~~~~~~~
+Nosferatu/Offence - code
+Perplex/Offence - ideas, moral support
