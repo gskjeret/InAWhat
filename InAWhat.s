@@ -1,23 +1,14 @@
 BB_TARGET = 32
 
-; Set to 0 for running on real hardware
-; DEBUG_DETAIL set 1
-
 	ifnd MakeExe
 MakeExe set 0
 	endif
-
-	ifge MakeExe
-		printt "Building exe"
-		section code, code_c
-	endc
 
 	include macros.S
 	include	customregs.S
 
 BB_START
-
-; These are magic bytes and can't be changed
+; These are magic bytes and must not be farked with 
 	ifeq MakeExe
 		printt "Building bootblock"
 		dc.b	"DOS",0
@@ -25,36 +16,41 @@ BB_START
 	endc
 
 Startup:
-; If we boot from bootblock clearing DMA channels is not required
-	ifne MakeExe
-		lea	CustomBase+6,a6
-		move.w	#$7fff,DMACON-6(a6)
-	endc
-	
-	add.w	#cop-BB_START,a4
-	move.l	a4,$dff080
-.Wait:	
-; Wait? nah, let's just execute the copperlist and see what happens
+; When booting, a4 points to the start of the bootblock (BB_START)
+; We tried many ways of increasing a4 by 12 or more, since the copper would choke on the 370 longword.
+; Unfortunately we did not find a method that took less than 4 bytes. And nobody loves a 34 byte intro.
+; So this was the best we could do. The magic number will vary by kickstart (how much chipmem will libraries etc take)
+; and by whether there's fastmem available (some data will get put there instead of in chipmem).
+; No other variables should affect it. Of course, sadly this will not work in an executable. Or on any other combination
+; of kickstart and fastmem available/unavailable than it's designed for. Told you it was bad!
+
+MAGIC_COPADDR = $156c ; Kick 1.2/1.3, fastmem exists
+; MAGIC_COPADDR = $5c54 ; Kick 1.2/1.3, no fastmem
+; MAGIC_COPADDR = $5b9c ; Kick 1.2, no fastmem
+; MAGIC_COPADDR = $3a74 ; AROS Kick, fastmem exists (AROS version from WinUAE 4.9.0)
+; MAGIC_COPADDR = $4bf4 ; AROS Kick, no fastmem (AROS version from WinUAE 4.9.0)
+; Didn't seem to work on Kick 3.1 And then I got bored. Feel free to do a PR if you want more 
+; kickstarts for whatever reason
+
+	move.w	#MAGIC_COPADDR,CustomBase+COP1LCL
+
+; .Wait:	
+	; bra	.Wait
+; Wait? nah, we have no bytes for that. Let's just run the copperlist and see what happens
 
 cop:
-	ifne MakeExe
-	; Kill sprites if potentially coming from CLI or WB 
-	dc.l	$01400000
-	dc.l	$01420000
-	dc.l	$01440000
-	dc.l	$01460000
-	endif
-
-	; BPLCON0 can be skipped when bootblock
-	; Can also be skipped for exe, because BPL DMA is turned off
-	; dc.w	BPLCON0,$0200 
 
 	dc.w	$0180,$006c
 	dc.W	$a801,$fffe
-; Almost the right color
-	dc.w	$0180,$6Ff4;$0fc0
+; Almost the right color. It's supposed to be $fc0. Close enough for most people.
+; Using the correct yellow would cause the CPU to branch just a bit too far
+	dc.w	$0180,$6ff4
+; Yes, I did say branch. And in your heart you begin to understand just how terrible this code is.
 
-	; dc.w	$ffff,$fffe ; Lulz
+	; dc.w	$ffff,$fffe 
+; We omit the copwait, assuming that the RAM is zero filled
+; In which case the copper will halt at the first instruction
+; It will restart at the next frame though
 
 BB_END:
 	ifeq MakeExe
