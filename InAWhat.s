@@ -36,7 +36,7 @@ MAGIC_COPADDR = $156c ; Kick 1.2/1.3, fastmem exists
 cop:
 
 	dc.w	$0180,$006c
-	dc.W	$a801,$fffe
+	dc.W	$a809,$fffe
 ; Almost the right color. It's supposed to be $fc0. Close enough for most people.
 ; Using the correct yellow would cause the CPU to branch just a bit too far
 	dc.w	$0180,$6ff4
